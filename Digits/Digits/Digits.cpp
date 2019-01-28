@@ -95,19 +95,20 @@ void getImages(Mat& trainingImages, vector<int>& trainingLabels, int number)
 }
 
 void summary(int* result, string filename, int num_files, int mistakes) {
-	cout << endl << "testing summary for " << filename << endl;
+	cout << "testing summary for " << filename << endl;
 	cout << "total images:" << num_files << endl;
-	cout << "total mistakes: " << mistakes << endl << "accuracy: " << 100.0 - ((float)mistakes / (float)num_files) * 100 << endl << endl << endl;
-	//for (int i = 0; i < 10; i++) {
-	//	cout << "there are " << result[i] << " images that are a " << i << endl;
-	//}
+	cout << "total mistakes: " << mistakes << endl << "accuracy: " << 100.0 - ((float)mistakes / (float)num_files) * 100 << endl;
+	for (int i = 0; i < 10; i++) {
+		cout << "there are " << result[i] << " images that are a " << i << endl;
+	}
+	cout << endl << endl << endl;
 }
 
 
 // return filename of file containing trained SVM
 string trainSVM(Mat trainingImages, vector<int> trainingLabels, double c, double gamma, double degree, double coef0, double nu, double p) {
-	string filename = "gridsearch";
-	filename.append("c").append(to_string(c).substr(0, 3)).append("g").append(to_string(gamma).substr(0, 3)).append(".xml");
+	string filename = "RBFgridsearch_";
+	filename.append("c").append(to_string(int(c))).append("g").append(to_string(int(gamma))).append(".xml");
 
 	cout << "training " << filename << "..." << endl;
 	cout << "c:" << c << "   gamma:" << gamma << "   degree:" << degree << "   coef0:" << coef0 << "   nu:" << nu << "   p:" << p << endl;
@@ -130,7 +131,7 @@ string trainSVM(Mat trainingImages, vector<int> trainingLabels, double c, double
 		//intialize SVM to start training
 		Ptr<SVM> svm = SVM::create();
 		svm->setType(cv::ml::SVM::C_SVC);
-		svm->setKernel(cv::ml::SVM::LINEAR);
+		svm->setKernel(cv::ml::SVM::RBF);
 		svm->setDegree(degree);
 		svm->setGamma(gamma);
 		svm->setCoef0(coef0);
