@@ -32,26 +32,26 @@ int main()
 	//get data
 	Mat trainingImages;
 	vector<int> trainingLabels;
-	Mat trainingImages2;
-	Mat trainingLabels2;
 
 	for (int i = 0; i < 10; i++) {
 		getImages(trainingImages, trainingLabels, i);
 	}
 
+	Mat trainingImages2;
+	trainingImages.copyTo(trainingImages2);
+	Mat trainingLabels2;
+	Mat(trainingLabels).copyTo(trainingLabels2);
+
+	trainingImages2.convertTo(trainingImages2, CV_32F);
+	Ptr<TrainData> trainingData = TrainData::create(trainingImages2, ROW_SAMPLE, trainingLabels2);
+
 
 	//set grid search
 	double cValues[2] = { 1.0, 2.0 };
-	double gammaValues[2] = { 1.0, 2.0 };
+	double gammaValues[2] = { 2.0, 2.0 };
 
 	for (int i = 0; i < sizeof(cValues); i++) {
 		for (int j = 0; j < sizeof(gammaValues); j++) {
-
-			trainingImages.copyTo(trainingImages2);
-			Mat(trainingLabels).copyTo(trainingLabels2);
-			trainingImages2.convertTo(trainingImages2, CV_32F);
-			Ptr<TrainData> trainingData = TrainData::create(trainingImages2, ROW_SAMPLE, trainingLabels2);
-
 			string filename = trainSVM(trainingData, cValues[i], gammaValues[j]);
 
 			int result[10];
