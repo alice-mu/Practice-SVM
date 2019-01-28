@@ -22,7 +22,7 @@ using namespace cv::ml;
 
 void getFiles(string path, vector<string>& files);
 void getImages(Mat& trainingImages, vector<int>& trainingLabels, int number);
-string trainSVM(Mat trainingImages, vector<int> trainingLabels, double c, double gamma, double degree = 0, double coef0 = 0, double nu = 0, double p = 0);
+string trainSVM(Mat trainingImages, vector<int> trainingLebels, double c, double gamma, double degree = 0, double coef0 = 0, double nu = 0, double p = 0);
 void getTestFiles(string path, vector<string>& files);
 int testSVM(int& mistakes, int* result, string filename);
 void summary(int* result, string filename, int num_files, int mistakes);
