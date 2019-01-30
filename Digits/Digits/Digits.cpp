@@ -64,6 +64,27 @@ int main()
 	return 0;
 }
 
+//Mat deskew(Mat& image)
+//{
+//	int SZ = 20;
+//	float affineFlags = WARP_INVERSE_MAP|INTER_LINEAR;
+//
+//	Mat image2;
+//	image.copyTo(image2);
+//	image2.convertTo(image2, CV_32F);
+//	Moments m = moments(image2);
+//
+//	if (m.mu02 < 0.01 && m.mu02 > -0.01) {
+//		return image2.clone();
+//	}
+//
+//	float skew = m.mu11 / m.mu02;
+//	Mat warpMat = (Mat_<float>(2, 3) << 1, skew, -0.5*SZ*skew, 0, 1, 0);
+//	Mat imgOut = Mat::zeros(image2.rows, image2.cols, image2.type());
+//	warpAffine(image2, imgOut, warpMat, imgOut.size(), affineFlags);
+//
+//	return imgOut;
+//}
 
 void getFiles(string path, vector<string>& files)
 {
@@ -89,6 +110,10 @@ void getImages(Mat& trainingImages, vector<int>& trainingLabels, int number)
 	{
 		Mat  SrcImage = imread(files[i].c_str());
 		SrcImage = SrcImage.reshape(1, 1);
+		//Mat deskewed = deskew(SrcImage);
+		//deskewed = deskewed.reshape(1, 1);
+		//imshow("deskewed", deskewed);
+		//waitKey();
 		trainingImages.push_back(SrcImage);
 		trainingLabels.push_back(number);
 	}
