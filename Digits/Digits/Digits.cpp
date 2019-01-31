@@ -101,7 +101,7 @@ void getFiles(string path, vector<string>& files)
 
 void getImages(Mat& trainingImages, vector<int>& trainingLabels, int number)
 {
-	string filePath = "C:/Users/602151/Documents/Visual_Studio_Community/data/digits/";
+	string filePath = "../digitsdata/";
 	filePath.append(std::to_string(number));
 	vector<string> files;
 	getFiles(filePath, files);
@@ -132,7 +132,7 @@ void summary(int* result, string filename, int num_files, int mistakes) {
 
 // return filename of file containing trained SVM
 string trainSVM(Mat trainingImages, vector<int> trainingLabels, double c, double gamma, double degree, double coef0, double nu, double p) {
-	string filename = "RBFgridsearch_";
+	string filename = "gridsearch_";
 	filename.append("c").append(to_string(int(c))).append("g").append(to_string(int(gamma))).append(".xml");
 
 	cout << "training " << filename << "..." << endl;
@@ -156,7 +156,7 @@ string trainSVM(Mat trainingImages, vector<int> trainingLabels, double c, double
 		//intialize SVM to start training
 		Ptr<SVM> svm = SVM::create();
 		svm->setType(cv::ml::SVM::C_SVC);
-		svm->setKernel(cv::ml::SVM::RBF);
+		svm->setKernel(cv::ml::SVM::LINEAR);
 		svm->setDegree(degree);
 		svm->setGamma(gamma);
 		svm->setCoef0(coef0);
@@ -196,7 +196,7 @@ void getTestFiles(string path, vector<string>& files) {
 // returns number of files tested on
 int testSVM(int& mistakes, int* result, string filename) {
 	cout << "testing..." << endl;
-	const char * filePath = "C:/Users/602151/Documents/Visual_Studio_Community/data/digits";
+	const char * filePath = "../digitsdata";
 	vector<string> files;
 	getTestFiles(filePath, files);
 	int num_files = files.size();
