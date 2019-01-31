@@ -45,7 +45,9 @@ int main()
 		else
 			currRect++;
 	}
-	
+
+	//DrawRectangles(img, boundRect);
+
 	vector<int> results;
 	for (int i = 0; i < boundRect.size(); i++) {
 		Rect rect = boundRect[i];
@@ -53,9 +55,14 @@ int main()
 		Range yRange = Range(rect.tl().y, rect.tl().y + rect.height);
 
 		Mat oneDigit = bw(yRange, xRange);
+		Mat extra(rect.height, rect.height - rect.width, CV_32F, (float)0);
+		//oneDigit.push_back(extra);
+
 		Size size(200, 200);
 		resize(oneDigit, oneDigit, size);
 		oneDigit.reshape(1, 1);
+		imshow("segmented digit", oneDigit);
+		waitKey();
 
 		int result = SVMpredict(oneDigit);
 		results.push_back(result);
@@ -83,7 +90,9 @@ int SVMpredict(Mat img) {
 	img2 = img2.reshape(1, 1);
 	img2.convertTo(img2, CV_32F);
 
-	int result = (int)svm->predict(img2);
+	Mat test = imread("C:/Users/lenovo/Documents/Visual_Studio_Community/data/digits/1/0.jpg");
+
+	int result = (int)svm->predict(test);
 	return result;
 }
 
