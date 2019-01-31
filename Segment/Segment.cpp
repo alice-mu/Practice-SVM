@@ -8,24 +8,27 @@
 #include <opencv2/highgui/highgui.hpp>  
 #include <opencv2/ml/ml.hpp>  
 #include <io.h>
+#include <filesystem>
 
 using namespace std;
 using namespace cv;
 using namespace cv::ml;
 
+int testSVM(Mat img);
+void DrawRectangles(Mat img, vector<Rect> boundRect);
+
 int main()
 {
 	Mat img = imread("C:/Users/lenovo/Documents/Visual_Studio_Community/Data/handwriting_crop.jpg");
-	Mat gray;
-	cvtColor(img, gray, CV_BGR2GRAY);
-
-	threshold(gray, gray, 170, 255, THRESH_BINARY_INV);
+	Mat bw;
+	cvtColor(img, bw, CV_BGR2GRAY);
+	threshold(bw, bw, 170, 255, THRESH_BINARY_INV);
 
 	vector<Mat> contours;
-	Mat gray2;
-	gray.copyTo(gray2);
+	Mat bw2;
+	bw.copyTo(bw2);
 
-	findContours(gray2, contours, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	findContours(bw2, contours, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
 
 	vector<Rect> boundRect(contours.size());
@@ -44,14 +47,49 @@ int main()
 			currRect++;
 	}
 
+	vector<int> results;
+	for (int i = 0; i < boundRect.size(); i++) {
+		Rect rect = boundRect[i];
+		Range xRange = Range(rect.tl().x, rect.tl().x + rect.width);
+		Range yRange = Range(rect.tl().y, rect.tl().y + rect.height);
+		Mat oneDigit = bw(xRange, yRange);
 
-	RNG rng(12345);
+		imshow("segmented digit", bw);
+		waitKey();
+
+		int result = testSVM(oneDigit);
+		results.push_back(result);
+	}
+
+	waitKey();
+	return 0;
+}
 
 
-	Mat drawing = Mat::zeros(gray.size(), CV_8UC3);
+int testSVM(Mat img) {
+	const string SVMfilename = "../Digits/Digits/RBFgridsearch_c1g1.xml";
+	Ptr<SVM> svm = SVM::create();
+	svm->clear();
+	FileStorage svm_fs(SVMfilename, FileStorage::READ);
+	if (svm_fs.isOpened())
+	{
+		svm = Algorithm::load<SVM>(SVMfilename);
+	}
+
 	Mat img2;
 	img.copyTo(img2);
-	for (int i = 0; i < contours.size(); i++)
+	img2 = img2.reshape(1, 1);
+	img2.convertTo(img2, CV_32F);
+	int response = (int)svm->predict(img2);
+	return response;
+}
+
+
+void DrawRectangles(Mat img, vector<Rect> boundRect) {
+	RNG rng(12345);
+	Mat img2;
+	img.copyTo(img2);
+	for (int i = 0; i < boundRect.size(); i++)
 	{
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		rectangle(img2, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
@@ -61,7 +99,5 @@ int main()
 	Size size(1500, 750);
 	resize(img2, img2, size);
 	imshow("Contours", img2);
-
 	waitKey();
-	return 0;
 }
