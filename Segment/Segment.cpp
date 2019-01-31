@@ -25,44 +25,25 @@ int main()
 	Mat gray2;
 	gray.copyTo(gray2);
 
-	findContours(gray2, contours, RETR_LIST, CV_CHAIN_APPROX_NONE);
-
-	cout << "contour size: " << contours.size() << endl;
-
-	//vector<vector<Point> >::iterator itrContour = contours.begin();
-
-	////// remove smaller contours
-	//while (itrContour != contours.end())
-	//{
-	//	Rect rectBound = boundingRect(*itrContour);
-	//	cout << rectBound << endl;
-	////	rectBound.y += rowCount;
-
-	////	if (itrContour->size() < iMinContour || rectBound.height < mBandSize - 2 || rectBound.width < 20 || rectBound.width > 200)
-	////	{
-	////		itrContour = contours.erase(itrContour);
-	////	}
-	////	else
-	////	{
-	////		curBandContours.push_back(rectBound);
-	//		++itrContour;
-	////	}
-	//}
+	findContours(gray2, contours, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
 
-
-	vector<Mat> contours_poly(contours.size());
 	vector<Rect> boundRect(contours.size());
-	for (int i = 0; i < contours.size(); i++)
-	{
-		approxPolyDP(contours.at(i), contours_poly[i], 3, true);
+	for (int i = 0; i < contours.size(); i++) {
 		boundRect[i] = boundingRect(contours.at(i));
-
-		//vector<Point> curContour = contours.at(i);
-		//for (int j = 0; j < curContour.size(); j++){
-		//	cout << curContour[j].x << "  " << curContour[j].y << endl;
-		// }
 	}
+
+	// remove small contours
+	// set minimum size as 1/10000th of the image size
+	int minSize = img.rows * img.cols / 10000;
+	vector<Rect>::iterator currRect = boundRect.begin();
+	while (currRect != boundRect.end()) {
+		if (currRect->width * currRect->height < minSize)
+			currRect = boundRect.erase(currRect);
+		else
+			currRect++;
+	}
+
 
 	RNG rng(12345);
 
@@ -73,7 +54,6 @@ int main()
 	for (int i = 0; i < contours.size(); i++)
 	{
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		drawContours(img2, contours, i, color, 2, 8, vector<Vec4i>(), 0, Point());
 		rectangle(img2, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
 	}
 
