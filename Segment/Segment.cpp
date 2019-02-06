@@ -13,7 +13,7 @@ using namespace std;
 using namespace cv;
 using namespace cv::ml;
 
-int SVMpredict(Mat img);
+int SVMpredict(Mat img, SVM* svm);
 void DrawRectangles(Mat img, vector<Rect> boundRect);
 
 int main()
@@ -45,20 +45,34 @@ int main()
 		else
 			currRect++;
 	}
-	
+
+	string filename = "../Digits/Digits/RBFgridsearch_c1g1.xml";
+	Ptr<SVM> svm = Algorithm::load<SVM>(filename);
+
 	vector<int> results;
+
+	// save images into folder
 	for (int i = 0; i < boundRect.size(); i++) {
 		Rect rect = boundRect[i];
 		Range xRange = Range(rect.tl().x, rect.tl().x + rect.width);
 		Range yRange = Range(rect.tl().y, rect.tl().y + rect.height);
 
 		Mat oneDigit = bw(yRange, xRange);
+		string filename = "./Segmented_Digits/";
+		filename.append(to_string(i)).append(".jpg");
+		imwrite(filename, oneDigit);
+
+		oneDigit = imread(filename);
 		Size size(200, 200);
 		resize(oneDigit, oneDigit, size);
 		oneDigit.reshape(1, 1);
 
-		int result = SVMpredict(oneDigit);
+		int result = SVMpredict(oneDigit, svm);
 		results.push_back(result);
+	}
+
+	for (int i = 0; i < boundRect.size(); i++) {
+		cout << results.at(i);
 	}
 
 	waitKey();
@@ -66,16 +80,7 @@ int main()
 }
 
 
-int SVMpredict(Mat img) {
-	const string SVMfilename = "C:/Users/lenovo/source/repos/alice-mu/Practice-SVM/Digits/Digits/gridsearch_c1g10.xml";
-	Ptr<SVM> svm = SVM::create();
-	svm->clear();
-	FileStorage svm_fs(SVMfilename, FileStorage::READ);
-	if (svm_fs.isOpened())
-	{
-		svm = Algorithm::load<SVM>(SVMfilename);
-	}
-
+int SVMpredict(Mat img, SVM* svm) {
 	Mat img2;
 	img.copyTo(img2);
 	Size size(20, 20);
