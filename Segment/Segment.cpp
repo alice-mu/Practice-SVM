@@ -46,6 +46,18 @@ int main()
 			currRect++;
 	}
 
+	// insertion sort rectangles from left to right
+	for (int i = 1; i < boundRect.size(); i++) {
+		Rect currRect = boundRect[i];
+		int trav = i - 1;
+		while (trav >= 0 && boundRect[trav].tl().x > currRect.tl().x) {
+			boundRect[trav + 1] = boundRect[trav];
+			trav--;
+		}
+		boundRect[trav + 1] = currRect;
+	}
+
+
 	string filename = "../Digits/Digits/RBFgridsearch_c1g1.xml";
 	Ptr<SVM> svm = Algorithm::load<SVM>(filename);
 
