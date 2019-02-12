@@ -70,14 +70,15 @@ int main()
 		Range yRange = Range(rect.tl().y, rect.tl().y + rect.height);
 
 		Mat oneDigit = bw(yRange, xRange);
+
+
+
 		Size size(200, 200);
 		resize(oneDigit, oneDigit, size);
 		oneDigit.reshape(1, 1);
-
 		string filename = "./Segmented_Digits/";
 		filename.append(to_string(i)).append(".jpg");
 		imwrite(filename, oneDigit);
-
 		oneDigit = imread(filename);
 		int result = SVMpredict(oneDigit, svm);
 		results.push_back(result);
